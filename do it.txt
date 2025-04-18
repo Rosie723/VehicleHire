@@ -1,0 +1,194 @@
+Enter password: *********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 9.0.1 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database VehicleHire;
+Query OK, 1 row affected (0.34 sec)
+
+mysql> use VehicleHire;
+Database changed
+mysql> CREATE TABLE users (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     username VARCHAR(50) NOT NULL,
+    ->     password VARCHAR(255) NOT NULL,
+    ->     role ENUM('Admin', 'Employee', 'Customer') NOT NULL,
+    ->     name VARCHAR(100) NOT NULL,
+    ->     contact_info VARCHAR(100) NOT NULL,
+    ->     driving_license_number VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (5.33 sec)
+
+mysql> CREATE TABLE customers (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     name VARCHAR(100) NOT NULL,
+    ->     contact_info VARCHAR(100) NOT NULL,
+    ->     driving_license_number VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.73 sec)
+
+mysql> CREATE TABLE vehicles (
+    ->     vehicle_id VARCHAR(10) PRIMARY KEY,
+    ->     brand VARCHAR(50) NOT NULL,
+    ->     model VARCHAR(50) NOT NULL,
+    ->     category ENUM('Cars', 'Trucks', 'Vans', 'Bikes') NOT NULL,
+    ->     rental_price DECIMAL(10, 2) NOT NULL,
+    ->     availability BOOLEAN NOT NULL
+    -> );
+Query OK, 0 rows affected (0.61 sec)
+
+mysql> CREATE TABLE bookings (
+    ->     booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     vehicle_id VARCHAR(10),
+    ->     start_date DATE NOT NULL,
+    ->     end_date DATE NOT NULL,
+    ->     FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
+    -> );
+Query OK, 0 rows affected (1.41 sec)
+
+mysql> CREATE TABLE payments (
+    ->     payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     booking_id INT,
+    ->     amount DECIMAL(10, 2) NOT NULL,
+    ->     FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+    -> );
+Query OK, 0 rows affected (0.94 sec)
+
+mysql> INSERT INTO users (username, password, role, name, contact_info) VALUES
+    ->      ('admin', 'admin123', 'Admin', 'Admin User', 'admin@example.com'),
+    ->      ('employee1', 'employee123', 'Employee', 'Employee One', 'employee1@example.com');
+Query OK, 2 rows affected (1.96 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql>  INSERT INTO users (username, password, role, name, contact_info) VALUES
+    ->     ('customer1', 'customerPassword', 'Customer', 'John Doe', 'john@example.com');
+Query OK, 1 row affected (0.12 sec)
+
+mysql>  INSERT INTO customers (name, contact_info, driving_license_number) VALUES
+    ->      ('John Doe', 'john@example.com', 'DL123456'),
+    ->      ('Jane Smith', 'jane@example.com', 'DL654321');
+Query OK, 2 rows affected (0.11 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql>  INSERT INTO vehicles (vehicle_id, brand, model, category, rental_price, availability) VALUES
+    ->      ('V001', 'Toyota', 'Camry', 'Cars', 50.00, TRUE),
+    ->      ('V002', 'Ford', 'F-150', 'Trucks', 70.00, TRUE),
+    ->      ('V003', 'Honda', 'Odyssey', 'Vans', 60.00, TRUE),
+    ->      ('V004', 'Yamaha', 'YZF-R3', 'Bikes', 30.00, TRUE);
+Query OK, 4 rows affected (0.20 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from users;
++----+-----------+------------------+----------+--------------+-----------------------+------------------------+
+| id | username  | password         | role     | name         | contact_info          | driving_license_number |
++----+-----------+------------------+----------+--------------+-----------------------+------------------------+
+|  1 | admin     | admin123         | Admin    | Admin User   | admin@example.com     | NULL                   |
+|  2 | employee1 | employee123      | Employee | Employee One | employee1@example.com | NULL                   |
+|  3 | customer1 | customerPassword | Customer | John Doe     | john@example.com      | NULL                   |
++----+-----------+------------------+----------+--------------+-----------------------+------------------------+
+3 rows in set (0.11 sec)
+
+mysql> select * from customers;
++----+------------+------------------+------------------------+
+| id | name       | contact_info     | driving_license_number |
++----+------------+------------------+------------------------+
+|  1 | John Doe   | john@example.com | DL123456               |
+|  2 | Jane Smith | jane@example.com | DL654321               |
++----+------------+------------------+------------------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from payments;
+Empty set (0.00 sec)
+
+mysql> select * from bookings;
+Empty set (0.00 sec)
+
+mysql> select * from vehicles;
++------------+--------+---------+----------+--------------+--------------+
+| vehicle_id | brand  | model   | category | rental_price | availability |
++------------+--------+---------+----------+--------------+--------------+
+| V001       | Toyota | Camry   | Cars     |        50.00 |            1 |
+| V002       | Ford   | F-150   | Trucks   |        70.00 |            1 |
+| V003       | Honda  | Odyssey | Vans     |        60.00 |            1 |
+| V004       | Yamaha | YZF-R3  | Bikes    |        30.00 |            1 |
++------------+--------+---------+----------+--------------+--------------+
+4 rows in set (0.05 sec)
+
+mysql> ALTER TABLE vehicles ADD COLUMN image_path VARCHAR(255);
+Query OK, 0 rows affected (4.51 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO vehicles (vehicle_id, brand, model, category, rental_price, availability, image_path) VALUES
+    ->     ('V001', 'Toyota', 'Camry', 'Cars', 50.00, TRUE, 'path/to/toyota_camry.jpg'),
+    ->     ('V002', 'Ford', 'F-150', 'Trucks', 70.00, TRUE, 'path/to/ford_f150.jpg'),
+    ->     ('V003', 'Honda', 'Odyssey', 'Vans', 60.00, TRUE, 'path/to/honda_odyssey.jpg'),
+    ->     ('V004', 'Yamaha', 'YZF-R3', 'Bikes', 30.00, TRUE, 'path/to/yamaha_yzf_r3.jpg');
+ERROR 1062 (23000): Duplicate entry 'V001' for key 'vehicles.PRIMARY'
+mysql> INSERT INTO vehicles (vehicle_id, brand, model, category, rental_price, availability, image_path) VALUES
+    ->     ('V002', 'Ford', 'F-150', 'Trucks', 70.00, TRUE, 'path/to/ford_f150.jpg'),
+    ->     ('V003', 'Honda', 'Odyssey', 'Vans', 60.00, TRUE, 'path/to/honda_odyssey.jpg'),
+    ->     ('V004', 'Yamaha', 'YZF-R3', 'Bikes', 30.00, TRUE, 'path/to/yamaha_yzf_r3.jpg');
+ERROR 1062 (23000): Duplicate entry 'V002' for key 'vehicles.PRIMARY'
+mysql> INSERT INTO vehicles (vehicle_id, brand, model, category, rental_price, availability, image_path) VALUES
+    -> );
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 2
+mysql> DELETE FROM vehicles;
+Query OK, 4 rows affected (0.41 sec)
+
+mysql> select * from vehicles;
+Empty set (0.05 sec)
+
+mysql> INSERT INTO vehicles (vehicle_id, brand, model, category, rental_price, availability, image_path) VALUES
+    ->     ('V001', 'Toyota', 'Camry', 'Cars', 50.00, TRUE, 'path/to/toyota_camry.jpg'),
+    ->     ('V002', 'Ford', 'F-150', 'Trucks', 70.00, TRUE, 'path/to/ford_f150.jpg'),
+    ->     ('V003', 'Honda', 'Odyssey', 'Vans', 60.00, TRUE, 'path/to/honda_odyssey.jpg'),
+    ->     ('V004', 'Yamaha', 'YZF-R3', 'Bikes', 30.00, TRUE, 'path/to/yamaha_yzf_r3.jpg');
+Query OK, 4 rows affected (0.31 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from vehicles;
++------------+--------+---------+----------+--------------+--------------+---------------------------+
+| vehicle_id | brand  | model   | category | rental_price | availability | image_path                |
++------------+--------+---------+----------+--------------+--------------+---------------------------+
+| V001       | Toyota | Camry   | Cars     |        50.00 |            1 | path/to/toyota_camry.jpg  |
+| V002       | Ford   | F-150   | Trucks   |        70.00 |            1 | path/to/ford_f150.jpg     |
+| V003       | Honda  | Odyssey | Vans     |        60.00 |            1 | path/to/honda_odyssey.jpg |
+| V004       | Yamaha | YZF-R3  | Bikes    |        30.00 |            1 | path/to/yamaha_yzf_r3.jpg |
++------------+--------+---------+----------+--------------+--------------+---------------------------+
+4 rows in set (0.04 sec)
+
+mysql> select * from users;
++----+-----------+------------------+----------+--------------+-----------------------+------------------------+
+| id | username  | password         | role     | name         | contact_info          | driving_license_number |
++----+-----------+------------------+----------+--------------+-----------------------+------------------------+
+|  1 | admin     | admin123         | Admin    | Admin User   | admin@example.com     | NULL                   |
+|  2 | employee1 | employee123      | Employee | Employee One | employee1@example.com | NULL                   |
+|  3 | customer1 | customerPassword | Customer | John Doe     | john@example.com      | NULL                   |
++----+-----------+------------------+----------+--------------+-----------------------+------------------------+
+3 rows in set (0.14 sec)
+
+mysql> select * from bookings;
++------------+------------+------------+------------+
+| booking_id | vehicle_id | start_date | end_date   |
++------------+------------+------------+------------+
+|          1 | V002       | 2025-04-15 | 2025-04-25 |
++------------+------------+------------+------------+
+1 row in set (0.03 sec)
+
+mysql> select * from payments;
++------------+------------+--------+
+| payment_id | booking_id | amount |
++------------+------------+--------+
+|          1 |          1 |  50.00 |
++------------+------------+--------+
+1 row in set (0.04 sec)
+
+mysql>
